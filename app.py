@@ -24,7 +24,18 @@ def setup_ctf_dirs():
         flag_path = os.path.join(d, f"flag-{i+1}.txt")
         with open(flag_path, "w") as f:
             f.write(flags[d])
-    
+
+def install_ping():
+    try:
+        result = subprocess.run(
+            ['apt', 'install', 'iputils-ping', '-y'],
+            check=True,
+            capture_output=True,
+            text=True
+        )
+    except subprocess.CalledProcessError as e:
+        pass
+
 def is_blocked():
     block_cookie = request.cookies.get("block")
     if block_cookie == "1": return True
@@ -55,7 +66,7 @@ def home():
     return '''
         <h2>Ping Lab - Command Injection</h2>
         <form action="/1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1" method="get">
-            <input name="domain" placeholder="Digite um IP ou hostname">
+            <input name="domain" placeholder="Digite o IP 127.0.0.1 ou localhost para começar a pingar">
             <button type="submit">Ping</button>
         </form>
     '''
@@ -114,5 +125,6 @@ def lvl3():
         return f"Erro ao executar comando: {str(e)}"
 
 if __name__ == '__main__':
+    install_ping()
     setup_ctf_dirs()
     app.run(debug=True)
