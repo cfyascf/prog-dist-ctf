@@ -5,7 +5,15 @@ app = Flask(__name__)
 ip_blacklist = []
 WORD_BLACKLIST = ['RM', 'rm', 'RMDIR', 'rmdir']
 
-
+def get_real_ip():
+    forwarded = request.headers.get("X-Forwarded-For")
+    if forwarded:
+        ip = forwarded.split(',')[0].strip()
+        print(ip)
+        return ip
+    print(request.remote_addr)
+    return request.remote_addr
+    
 def is_host_in_blacklist(host):
     if any(e in host for e in WORD_BLACKLIST):
         return True
@@ -22,28 +30,26 @@ def home():
     return '''
         <h2>Ping Lab - Command Injection</h2>
         <form action="/5d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1" method="get">
-            <input name="host" placeholder="Digite um IP ou hostname">
+            <input name="domain" placeholder="Digite um IP ou hostname">
             <button type="submit">Ping</button>
         </form>
     '''
 
 @app.route('/5d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1', methods=['GET'])
 def lvl1():
-    ip = request.remote_addr
-    if is_ip_blocked(ip): return f"<pre>Your IP is blocked, get out now</pre>"
+    ip = get_real_ip()
+    if is_ip_blocked(ip): return f"<pre>Your IP {ip} is blocked</pre>"
 
-    host = request.args.get('host')
-    if is_host_in_blacklist(host):
+    domain = request.args.get('domain')
+
+    if is_host_in_blacklist(domain):
         block_ip(ip)
-        return f"<pre>Your IP {ip} is blocked, get out now</pre>"
-    command = f"ping -c 2 {host}"
+        return f"<pre>Your IP {ip} is blocked/pre>"
 
-    try:
-        result = subprocess.check_output(command, shell=True, text=True, stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError as e:
-        result = f"Erro ao executar o comando:\n{e.output}"
 
-    return f"<pre>{result}</pre>"
+    result = subprocess.run(f'ping -c 1 {domain}', shell=True, capture_output=True, text=True)
+    output = result.stdout + result.stderr
+    return f"OUTPUT:<pre>{output}</pre>"
 
 if __name__ == '__main__':
     app.run(debug=True)
