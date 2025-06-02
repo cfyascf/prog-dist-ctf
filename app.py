@@ -8,11 +8,10 @@ WORD_BLACKLIST = ['RM', 'rm', 'RMDIR', 'rmdir']
 def get_real_ip():
     forwarded = request.headers.get("X-Forwarded-For")
     if forwarded:
-        ip = forwarded.split(',')[0].strip()
-        print(ip)
+        ip_port = forwarded.split(',')[0].strip()
+        ip = ip_port.split(':')[0]
         return ip
-    print(request.remote_addr)
-    return request.remote_addr
+    return None
     
 def is_host_in_blacklist(host):
     if any(e in host for e in WORD_BLACKLIST):
