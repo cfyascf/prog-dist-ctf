@@ -26,15 +26,7 @@ def setup_ctf_dirs():
             f.write(flags[d])
 
 def install_ping():
-    try:
-        result = subprocess.run(
-            ['apt', 'install', 'iputils-ping', '-y'],
-            check=True,
-            capture_output=True,
-            text=True
-        )
-    except subprocess.CalledProcessError as e:
-        pass
+    subprocess.run(f'apt install iputils-ping -y', shell=True, capture_output=True, text=True)
 
 def is_blocked():
     block_cookie = request.cookies.get("block")
