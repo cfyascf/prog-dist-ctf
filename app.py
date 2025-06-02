@@ -14,8 +14,8 @@ def setup_ctf_dirs():
         "34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3"
     ]
     flags = {
-        "1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1": "2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2",
-        "2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2": "34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3",
+        "1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1": "https://comp-dist-ctf-ahcrhva6dpeff2cb.brazilsouth-01.azurewebsites.net/2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2?domain=127.0.0.1",
+        "2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2": "https://comp-dist-ctf-ahcrhva6dpeff2cb.brazilsouth-01.azurewebsites.net/34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3?domain=127.0.0.1",
         "34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3": "FLAG${Y0U-R0CK}"
     }
     
@@ -58,7 +58,7 @@ def home():
     return '''
         <h2>Ping Lab - Command Injection</h2>
         <form action="/1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1" method="get">
-            <input name="domain" placeholder="Digite o IP 127.0.0.1 ou localhost para começar a pingar">
+            <input name="domain" value="127.0.0.1" placeholder="Digite o IP 127.0.0.1 ou localhost para começar a pingar">
             <button type="submit">Ping</button>
         </form>
     '''
@@ -70,7 +70,7 @@ def lvl1():
     if resp is not None: return resp
 
     try:
-        result = subprocess.run(f'cd ./1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1 && ping -c 1 {domain}', shell=True, capture_output=True, text=True)
+        result = subprocess.run(f'cd ./1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1 && ping -w 2 -c 1 {domain}', shell=True, capture_output=True, text=True)
         output = result.stdout + result.stderr
         return f"OUTPUT:<pre>{output}</pre>"
     except Exception as e:
@@ -82,14 +82,14 @@ def lvl2():
     resp = run_rules(domain)
     if resp is not None: return resp
     
-    blocked_cmd = ['127.0.0.1', '192.168.1.254',' ',';', '&&', '||']
+    blocked_cmd = [' ',';', '&&', '||']
 
     for b_cmd in blocked_cmd:
         if b_cmd in domain:
             return f'Erro: Comando nao permitido, tente bypassar esse filtro!'
         
     try:
-        result = subprocess.run(f'cd ./2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2 && ping -c 1 {domain}', shell=True, capture_output=True, text=True)
+        result = subprocess.run(f'cd ./2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2 && ping -w 2 -c 1 {domain}', shell=True, capture_output=True, text=True)
         output = result.stdout + result.stderr
         return f"OUTPUT:<pre>{output}</pre>"
     except Exception as e:
@@ -101,14 +101,14 @@ def lvl3():
     resp = run_rules(domain)
     if resp is not None: return resp
 
-    blocked_cmd = ['127.0.0.1', '192.168.1.254','\'', ';', '&&', ' ', '|', '&', '||']
+    blocked_cmd = ['\'', ';', '&&', ' ', '|', '&', '||']
 
     for b_cmd in blocked_cmd:
        if b_cmd in domain:
            return f'Erro: Comando nao permitido'
         
     try:
-        result = subprocess.run(f'cd ./34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3 && ping {domain} -c1', shell=True, capture_output=True, text=True)
+        result = subprocess.run(f'cd ./34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3 && ping -w 2 {domain} -c1', shell=True, capture_output=True, text=True)
         first_line = (result.stdout + result.stderr).strip().split('\n')[0]
         if 'Name or service' in first_line:
             return f"<pre>Safadinho tentou pegar erro, isso aqui nao vai te retornar erros verbosos!/pre>"
