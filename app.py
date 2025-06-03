@@ -4,7 +4,6 @@ import urllib
 import os
 
 app = Flask(__name__)
-ip_blacklist = []
 WORD_BLACKLIST = ['RM', 'rm', 'RMDIR', 'rmdir']
 
 def setup_ctf_dirs():
@@ -45,7 +44,7 @@ def is_domain_in_blacklist(domain):
 
 def is_path_traversal(payload):
     decoded = urllib.parse.unquote(payload)
-    patterns = ['..', '../', '..\\', '%2e%2e', '%2e%2f', '%2f%2e', '\\..', '/..']
+    patterns = ['..', '../', '..\\', '%2e%2e', '%2e%2f', '%2f%2e', '\\..', '/..', 'cd', 'CD']
     return any(p in decoded for p in patterns)
 
 def run_rules(domain):
@@ -105,7 +104,7 @@ def lvl3():
 
     for b_cmd in blocked_cmd:
        if b_cmd in domain:
-           return f'Erro: Comando nao permitido'
+           return f'Erro: Comando nao permitido, tente bypassar esse filtro!'
         
     try:
         result = subprocess.run(f'cd ./34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3 && ping -w 2 {domain} -c1', shell=True, capture_output=True, text=True)
