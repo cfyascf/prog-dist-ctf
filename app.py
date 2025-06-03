@@ -2,9 +2,16 @@ from flask import Flask, request, make_response, redirect
 import subprocess
 import urllib
 import os
+import re
 
 app = Flask(__name__)
-WORD_BLACKLIST = ['RM', 'rm', 'RMDIR', 'rmdir']
+BLACKLIST_PATTERNS = [
+    r'\brm\b', r'\brmdir\b'  # bloqueia comandos rm/rmdir (case-insensitive em busca)
+]
+
+TRAVERSAL_PATTERNS = [
+    r'\.\.', r'\.\./', r'\.\.\\', r'%2e%2e', r'%2e%2f', r'%2f%2e', r'\\\.\.', r'/\.\.', r'\bcd\b'
+]
 
 def setup_ctf_dirs():
     dirs = [
@@ -38,19 +45,22 @@ def assign_cookie():
     return resp
 
 def is_domain_in_blacklist(domain):
-    if any(e in domain for e in WORD_BLACKLIST):
-        return True
+    for pattern in BLACKLIST_PATTERNS:
+        if re.search(pattern, domain, flags=re.IGNORECASE):
+            return True
     return False
 
 def is_path_traversal(payload):
     decoded = urllib.parse.unquote(payload)
-    patterns = ['..', '../', '..\\', '%2e%2e', '%2e%2f', '%2f%2e', '\\..', '/..', 'cd', 'CD']
-    return any(p in decoded for p in patterns)
+    for pattern in TRAVERSAL_PATTERNS:
+        if re.search(pattern, decoded, flags=re.IGNORECASE):
+            return True
+    return False
 
 def run_rules(domain):
     if is_blocked(): return f"<pre>Seu IP Esta Bloqueado!/pre>"
     if is_domain_in_blacklist(domain): return assign_cookie()
-    if is_path_traversal(domain): return f"<pre>Travessia de Diretorio Detectada!/pre>"
+    if is_path_traversal(domain): return f"<pre>Travessia de Diretorio Detectada!</pre>"
 
 @app.route('/')
 def home():
@@ -110,7 +120,7 @@ def lvl3():
         result = subprocess.run(f'cd ./34f7e6a2-9b8c-4e17-82f1-3c5d9bfa2a11-lvl-3 && ping -w 2 {domain} -c1', shell=True, capture_output=True, text=True)
         first_line = (result.stdout + result.stderr).strip().split('\n')[0]
         if 'Name or service' in first_line:
-            return f"<pre>Safadinho tentou pegar erro, isso aqui nao vai te retornar erros verbosos!/pre>"
+            return f"<pre>Safadinho tentou pegar erro, isso aqui nao vai te retornar erros verbosos!</pre>"
         return f"OUTPUT:<pre> Comando Executado: ping {domain} -c1 </pre>\nResult: {first_line}"
     except Exception as e:
         return f"Erro ao executar comando: {str(e)}"
