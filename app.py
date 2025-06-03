@@ -5,8 +5,9 @@ import os
 import re
 
 app = Flask(__name__)
+
 BLACKLIST_PATTERNS = [
-    r'\brm\b', r'\brmdir\b'  # bloqueia comandos rm/rmdir (case-insensitive em busca)
+    r'\brm\b', r'\brmdir\b'
 ]
 
 TRAVERSAL_PATTERNS = [
@@ -58,7 +59,7 @@ def is_path_traversal(payload):
     return False
 
 def run_rules(domain):
-    if is_blocked(): return f"<pre>Seu IP Esta Bloqueado!/pre>"
+    if is_blocked(): return f"<pre>Seu IP Esta Bloqueado!</pre>"
     if is_domain_in_blacklist(domain): return assign_cookie()
     if is_path_traversal(domain): return f"<pre>Travessia de Diretorio Detectada!</pre>"
 
