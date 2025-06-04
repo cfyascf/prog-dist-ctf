@@ -11,7 +11,7 @@ BLACKLIST_PATTERNS = [
 ]
 
 TRAVERSAL_PATTERNS = [
-    r'\.\.', r'\.\./', r'\.\.\\', r'%2e%2e', r'%2e%2f', r'%2f%2e', r'\\\.\.', r'/\.\.', r'\bcd\b'
+    r'\.\.', r'\.\./', r'\.\.\\', r'%2e%2e', r'%2e%2f', r'%2f%2e', r'\\\.\.', r'/\.\.', r'\bcd\b', r'/'
 ]
 
 def setup_ctf_dirs():
@@ -111,10 +111,10 @@ def lvl3():
     resp = run_rules(domain)
     if resp is not None: return resp
 
-    blocked_cmd = ['\'', ';', '&&', ' ', '|', '&', '||']
+    blocked_cmd = ['\'', ';', '&&', ' ', '|', '&', '||', 'curl', 'wget']
 
     for b_cmd in blocked_cmd:
-       if b_cmd in domain:
+       if b_cmd in domain.lower():
            return f'Erro: Comando nao permitido, tente bypassar esse filtro!'
         
     try:
