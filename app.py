@@ -32,9 +32,6 @@ def setup_ctf_dirs():
         with open(flag_path, "w") as f:
             f.write(flags[d])
 
-def install_ping():
-    subprocess.run(f'apt install iputils-ping -y', shell=True, capture_output=True, text=True)
-
 def is_blocked():
     block_cookie = request.cookies.get("block")
     if block_cookie == "1": return True
@@ -97,11 +94,14 @@ def lvl2():
     for b_cmd in blocked_cmd:
         if b_cmd in domain:
             return f'Erro: Comando nao permitido, tente bypassar esse filtro!'
-        
     try:
         result = subprocess.run(f'cd ./2f8b1e6a-9c8d-4fd1-97b2-5db0cda55d0e-lvl-2 && ping -w 2 -c 1 {domain}', shell=True, capture_output=True, text=True)
         output = result.stdout + result.stderr
+        first_line = (result.stdout + result.stderr).strip().split('\n')[0]
+        if 'Name or service' in first_line:
+            return f"<pre>Safadinho tentou pegar erro, isso aqui nao vai te retornar erros verbosos!</pre>"    
         return f"OUTPUT:<pre>{output}</pre>"
+    
     except Exception as e:
         return f"Erro ao executar comando: {str(e)}"
 
@@ -122,11 +122,10 @@ def lvl3():
         first_line = (result.stdout + result.stderr).strip().split('\n')[0]
         if 'Name or service' in first_line:
             return f"<pre>Safadinho tentou pegar erro, isso aqui nao vai te retornar erros verbosos!</pre>"
-        return f"OUTPUT:<pre> Comando Executado: ping {domain} -c1 </pre>\nResult: {first_line}"
+        return f"OUTPUT:<pre> Comando Executado: ping -w 2 {domain} -c1 </pre>\nResult: {first_line}"
     except Exception as e:
         return f"Erro ao executar comando: {str(e)}"
 
 if __name__ == '__main__':
-    install_ping()
     setup_ctf_dirs()
     app.run(debug=True)
