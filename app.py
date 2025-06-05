@@ -76,6 +76,12 @@ def lvl1():
     resp = run_rules(domain)
     if resp is not None: return resp
 
+    blocked_cmd = ['vi', 'nano', 'vim']
+
+    for b_cmd in blocked_cmd:
+        if b_cmd in domain:
+            return f'Erro: Comando nao permitido, tente bypassar esse filtro!'
+
     try:
         result = subprocess.run(f'cd ./1d8f3d1a-b55b-4d23-b1cd-fd3d1e8a67e9-lvl-1 && ping -w 2 -c 1 {domain}', shell=True, capture_output=True, text=True)
         output = result.stdout + result.stderr
@@ -89,7 +95,7 @@ def lvl2():
     resp = run_rules(domain)
     if resp is not None: return resp
     
-    blocked_cmd = [' ',';', '&&', '||']
+    blocked_cmd = [' ',';', '&&', '||', 'vi', 'nano', 'vim']
 
     for b_cmd in blocked_cmd:
         if b_cmd in domain:
@@ -111,7 +117,7 @@ def lvl3():
     resp = run_rules(domain)
     if resp is not None: return resp
 
-    blocked_cmd = ['\'', ';', '&&', ' ', '|', '&', '||', 'curl', 'wget']
+    blocked_cmd = ['\'', ';', '&&', ' ', '|', '&', '||', 'curl', 'wget', 'vi', 'nano', 'vim']
 
     for b_cmd in blocked_cmd:
        if b_cmd in domain.lower():
